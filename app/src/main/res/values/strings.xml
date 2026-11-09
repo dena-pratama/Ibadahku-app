@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Ibadahku</string>
+    <string name="slogan">Dekat dengan Allah, Setiap Hari</string>
+    <string name="channel_prayer_name">Pengingat Sholat</string>
+    <string name="channel_prayer_desc">Notifikasi dan adzan untuk waktu sholat 5 waktu</string>
+</resources>
