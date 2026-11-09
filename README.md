@@ -1,4 +1,4 @@
-# 🌙 Ibadahku (إِبَادَتِي) — Aplikasi Pendamping Ibadah Harian Muslim Android
+# 🌙 Ibadahku (إِبَادَتِي) - Aplikasi Pendamping Ibadah Harian Muslim Android
 
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.4.21-purple.svg?style=flat&logo=kotlin)](https://kotlinlang.org)
 [![Android Gradle Plugin](https://img.shields.io/badge/AGP-9.4.1-green.svg?style=flat&logo=android)](https://developer.android.com/studio/releases/gradle-plugin)
