@@ -1,10 +1,19 @@
 package com.ibadahku.app.ui.screens
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -37,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ibadahku.app.data.model.DayPrayerSchedule
@@ -44,6 +54,7 @@ import com.ibadahku.app.data.model.PrayerScheduleItem
 import com.ibadahku.app.data.model.PrayerStatus
 import com.ibadahku.app.data.model.PrayerType
 import com.ibadahku.app.data.model.ReminderMode
+import com.ibadahku.app.ui.components.HeroMosqueCardArtwork
 import com.ibadahku.app.ui.theme.AccentBadgeBackground
 import com.ibadahku.app.ui.theme.AccentBadgeText
 import com.ibadahku.app.ui.theme.CreamBackground
@@ -133,7 +144,7 @@ fun PrayerScheduleScreen(
             }
         }
 
-        // 1. Redesigned Premium Islamic Header Card
+        // 1. Redesigned Premium Islamic Header Card with Mosque Artwork
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -148,16 +159,25 @@ fun PrayerScheduleScreen(
                     .background(
                         Brush.linearGradient(
                             listOf(
-                                Color(0xFF143021),
-                                Color(0xFF224F37),
-                                Color(0xFF2D5A43)
+                                Color(0xFF163C2A),
+                                Color(0xFF22513B),
+                                Color(0xFF2E654C)
                             )
                         )
                     )
-                    .padding(20.dp)
             ) {
+                // Subtle mosque silhouette background
+                HeroMosqueCardArtwork(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .padding(top = 8.dp),
+                    isDark = true
+                )
+
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -209,8 +229,8 @@ fun PrayerScheduleScreen(
                         modifier = Modifier
                             .size(68.dp)
                             .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.12f))
-                            .border(1.5.dp, Color(0xFFFDE047).copy(alpha = 0.4f), CircleShape),
+                            .background(Color.White.copy(alpha = 0.14f))
+                            .border(1.5.dp, Color(0xFFFDE047).copy(alpha = 0.5f), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -238,7 +258,28 @@ fun PrayerScheduleScreen(
 
         Spacer(modifier = Modifier.height(18.dp))
 
-        // 2. Segmented Pill Tab Switcher: [ Jadwal Sholat ] [ Riwayat & Statistik ]
+        // 2. Segmented Pill Tab Switcher with animated selection
+        val tab0Bg by animateColorAsState(
+            targetValue = if (selectedTab == 0) MaterialTheme.colorScheme.primary else Color.Transparent,
+            animationSpec = tween(250),
+            label = "tab0Bg"
+        )
+        val tab0Text by animateColorAsState(
+            targetValue = if (selectedTab == 0) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+            animationSpec = tween(250),
+            label = "tab0Text"
+        )
+        val tab1Bg by animateColorAsState(
+            targetValue = if (selectedTab == 1) MaterialTheme.colorScheme.primary else Color.Transparent,
+            animationSpec = tween(250),
+            label = "tab1Bg"
+        )
+        val tab1Text by animateColorAsState(
+            targetValue = if (selectedTab == 1) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+            animationSpec = tween(250),
+            label = "tab1Text"
+        )
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -251,7 +292,7 @@ fun PrayerScheduleScreen(
                 modifier = Modifier
                     .weight(1f)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(if (selectedTab == 0) MaterialTheme.colorScheme.primary else Color.Transparent)
+                    .background(tab0Bg)
                     .clickable { selectedTab = 0 }
                     .padding(vertical = 10.dp),
                 contentAlignment = Alignment.Center
@@ -259,7 +300,7 @@ fun PrayerScheduleScreen(
                 Text(
                     text = "Jadwal Hari Ini",
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        color = if (selectedTab == 0) Color.White else MaterialTheme.colorScheme.onSurface,
+                        color = tab0Text,
                         fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Medium,
                         fontSize = 13.sp
                     )
@@ -270,7 +311,7 @@ fun PrayerScheduleScreen(
                 modifier = Modifier
                     .weight(1f)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(if (selectedTab == 1) MaterialTheme.colorScheme.primary else Color.Transparent)
+                    .background(tab1Bg)
                     .clickable { selectedTab = 1 }
                     .padding(vertical = 10.dp),
                 contentAlignment = Alignment.Center
@@ -278,7 +319,7 @@ fun PrayerScheduleScreen(
                 Text(
                     text = "Riwayat & Statistik",
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        color = if (selectedTab == 1) Color.White else MaterialTheme.colorScheme.onSurface,
+                        color = tab1Text,
                         fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Medium,
                         fontSize = 13.sp
                     )
@@ -288,79 +329,95 @@ fun PrayerScheduleScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (selectedTab == 0) {
-            // ================== TAB 0: JADWAL SHOLAT ==================
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                schedule.items.forEach { item ->
-                    ImprovedPrayerTimeCard(
-                        item = item,
-                        onToggleReminder = { onToggleReminder(item.type) },
-                        onToggleStatus = { onTogglePrayerStatus(item.type) }
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(18.dp))
-
-            // Clean Modern Bottom Banner (Overlapping bug removed!)
-            val nextItem = schedule.nextPrayer ?: schedule.items.firstOrNull()
-            val nextName = nextItem?.type?.displayName ?: "Dzuhur"
-            val remaining = if (schedule.remainingTimeFormatted.isNotEmpty()) schedule.remainingTimeFormatted else "1 jam 12 menit"
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 14.dp),
-                    verticalAlignment = Alignment.CenterVertically
+        AnimatedContent(
+            targetState = selectedTab,
+            transitionSpec = {
+                if (targetState > initialState) {
+                    (slideInHorizontally(tween(280, easing = FastOutSlowInEasing)) { it / 3 } + fadeIn(tween(280)))
+                        .togetherWith(slideOutHorizontally(tween(220, easing = FastOutSlowInEasing)) { -it / 3 } + fadeOut(tween(200)))
+                } else {
+                    (slideInHorizontally(tween(280, easing = FastOutSlowInEasing)) { -it / 3 } + fadeIn(tween(280)))
+                        .togetherWith(slideOutHorizontally(tween(220, easing = FastOutSlowInEasing)) { it / 3 } + fadeOut(tween(200)))
+                }.using(SizeTransform(clip = false))
+            },
+            label = "PrayerScheduleTabAnim"
+        ) { currentTab ->
+            if (currentTab == 0) {
+                // ================== TAB 0: JADWAL SHOLAT ==================
+                Column(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(42.dp)
-                            .background(AccentBadgeBackground, CircleShape),
-                        contentAlignment = Alignment.Center
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Timer,
-                            contentDescription = null,
-                            tint = AccentBadgeText,
-                            modifier = Modifier.size(22.dp)
-                        )
+                        schedule.items.forEach { item ->
+                            ImprovedPrayerTimeCard(
+                                item = item,
+                                onToggleReminder = { onToggleReminder(item.type) },
+                                onToggleStatus = { onTogglePrayerStatus(item.type) }
+                            )
+                        }
                     }
 
-                    Spacer(modifier = Modifier.width(14.dp))
+                    Spacer(modifier = Modifier.height(18.dp))
 
-                    Column {
-                        Text(
-                            text = "$nextName dalam $remaining",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = 14.sp
-                            )
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = "Siapkan diri untuk menyambut panggilan-Nya tepat waktu",
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 11.sp
-                            )
-                        )
+                    // Clean Modern Bottom Banner (Overlapping bug removed!)
+                    val nextItem = schedule.nextPrayer ?: schedule.items.firstOrNull()
+                    val nextName = nextItem?.type?.displayName ?: "Dzuhur"
+                    val remaining = if (schedule.remainingTimeFormatted.isNotEmpty()) schedule.remainingTimeFormatted else "1 jam 12 menit"
+
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(42.dp)
+                                    .background(AccentBadgeBackground, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Timer,
+                                    contentDescription = null,
+                                    tint = AccentBadgeText,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(14.dp))
+
+                            Column {
+                                Text(
+                                    text = "$nextName dalam $remaining",
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        fontSize = 14.sp
+                                    )
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = "Siapkan diri untuk menyambut panggilan-Nya tepat waktu",
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        fontSize = 11.sp
+                                    )
+                                )
+                            }
+                        }
                     }
                 }
-            }
-
-        } else {
+            } else {
             // ================== TAB 1: RIWAYAT & STATISTIK ==================
             // Card 1: 7-Day Weekly Consistency Tracker
             Card(
@@ -694,8 +751,9 @@ fun PrayerScheduleScreen(
                 }
             }
         }
+    }
 
-        Spacer(modifier = Modifier.height(24.dp))
+    Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
@@ -706,8 +764,29 @@ fun ImprovedPrayerTimeCard(
     onToggleStatus: () -> Unit
 ) {
     val isHighlighted = item.isCurrent
-    val bgColor = if (isHighlighted) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f) else MaterialTheme.colorScheme.surface
-    val borderColor = if (isHighlighted) Color(0xFFFBBF24) else MaterialTheme.colorScheme.outline
+    val isDone = (item.status == PrayerStatus.DONE)
+    val isReminderActive = (item.reminderMode != ReminderMode.DISABLED)
+
+    // Animated container and border colors
+    val cardBgColor by animateColorAsState(
+        targetValue = when {
+            isHighlighted -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f)
+            isDone -> MaterialTheme.colorScheme.surface
+            else -> MaterialTheme.colorScheme.surface
+        },
+        animationSpec = tween(250),
+        label = "cardBgColor"
+    )
+
+    val cardBorderColor by animateColorAsState(
+        targetValue = when {
+            isHighlighted -> Color(0xFFF59E0B).copy(alpha = 0.7f)
+            isDone -> ForestGreen.copy(alpha = 0.35f)
+            else -> MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
+        },
+        animationSpec = tween(250),
+        label = "cardBorderColor"
+    )
 
     val arabicName = when (item.type) {
         PrayerType.SUBUH -> "الصُّبْح"
@@ -732,7 +811,7 @@ fun ImprovedPrayerTimeCard(
     // Infinite breathing glow for active prayer pill
     val infiniteTransition = rememberInfiniteTransition(label = "ActivePrayerPulse")
     val liveDotAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.4f,
+        initialValue = 0.35f,
         targetValue = 1.0f,
         animationSpec = infiniteRepeatable(
             animation = tween(800),
@@ -745,135 +824,175 @@ fun ImprovedPrayerTimeCard(
         modifier = Modifier
             .fillMaxWidth()
             .border(
-                width = if (isHighlighted) 1.5.dp else 1.dp,
-                color = borderColor,
+                width = if (isHighlighted) 1.2.dp else 1.dp,
+                color = cardBorderColor,
                 shape = RoundedCornerShape(16.dp)
             ),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = bgColor),
+        colors = CardDefaults.cardColors(containerColor = cardBgColor),
         elevation = CardDefaults.cardElevation(defaultElevation = if (isHighlighted) 2.dp else 0.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .padding(horizontal = 14.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Left: Icon Badge + Prayer Name (Latin & Arabic)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+            // 1. Icon in 38dp Circle
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(CircleShape)
+                    .background(
+                        when {
+                            isHighlighted -> Color(0xFFFEF3C7)
+                            isDone -> ForestGreen.copy(alpha = 0.12f)
+                            else -> MaterialTheme.colorScheme.surfaceVariant
+                        }
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = item.type.displayName,
+                    tint = when {
+                        isHighlighted -> Color(0xFFD97706)
+                        isDone -> ForestGreen
+                        else -> MaterialTheme.colorScheme.primary
+                    },
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // 2. Prayer Name & Status Subtitle (Uniform 2-line height for all items!)
+            Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(38.dp)
-                        .clip(CircleShape)
-                        .background(if (isHighlighted) Color(0xFFFEF3C7).copy(alpha = 0.25f) else MaterialTheme.colorScheme.surfaceVariant),
-                    contentAlignment = Alignment.Center
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = item.type.displayName,
-                        tint = if (isHighlighted) Color(0xFFD97706) else MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp)
+                    Text(
+                        text = item.type.displayName,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = if (isHighlighted) FontWeight.Bold else FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 15.sp
+                        ),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = arabicName,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = if (isHighlighted) Color(0xFFB45309) else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 12.sp
+                        ),
+                        maxLines = 1
                     )
                 }
 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
-                Column {
+                // Consistent subtitle across all cards (avoids any height jump!)
+                if (isHighlighted) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = item.type.displayName,
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                fontWeight = if (isHighlighted) FontWeight.Bold else FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = 15.sp
-                            )
+                        Box(
+                            modifier = Modifier
+                                .size(6.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFD97706).copy(alpha = liveDotAlpha))
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = arabicName,
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                color = if (isHighlighted) Color(0xFFD97706) else Color(0xFF9CA3AF),
+                            text = "Sedang Berjalan",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                color = Color(0xFFD97706),
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp
+                                fontSize = 11.sp
                             )
                         )
                     }
-
-                    if (isHighlighted) {
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                modifier = Modifier
-                                    .size(6.dp)
-                                    .clip(CircleShape)
-                                    .background(Color(0xFFD97706).copy(alpha = liveDotAlpha))
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "Sedang Berjalan",
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    color = Color(0xFFD97706),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 10.sp
-                                )
-                            )
-                        }
-                    }
+                } else if (isDone) {
+                    Text(
+                        text = "Sudah Dikerjakan ✓",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = ForestGreen,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 11.sp
+                        )
+                    )
+                } else {
+                    Text(
+                        text = "Belum Dikerjakan",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f),
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 11.sp
+                        )
+                    )
                 }
             }
 
-            // Right: Time + Bell + Check Button
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // 3. Right: Time + Bell Button + Checkmark Button
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
                 Text(
                     text = item.timeFormatted,
                     style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isHighlighted) Color(0xFF92400E) else MaterialTheme.colorScheme.onSurface,
                         fontSize = 15.sp
                     )
                 )
 
-                Spacer(modifier = Modifier.width(12.dp))
-
                 // Bell / Notification toggle icon
+                val bellTint by animateColorAsState(
+                    targetValue = if (isReminderActive) ForestGreen else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f),
+                    animationSpec = tween(200),
+                    label = "BellTint"
+                )
                 IconButton(
                     onClick = onToggleReminder,
                     modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
-                        imageVector = if (item.reminderMode != ReminderMode.DISABLED) {
-                            Icons.Default.Notifications
-                        } else {
-                            Icons.Default.NotificationsOff
-                        },
+                        imageVector = if (isReminderActive) Icons.Default.Notifications else Icons.Default.NotificationsOff,
                         contentDescription = "Pengingat",
-                        tint = if (item.reminderMode != ReminderMode.DISABLED) ForestGreen else Color(0xFFCBD5E1),
+                        tint = bellTint,
                         modifier = Modifier.size(19.dp)
                     )
                 }
 
-                Spacer(modifier = Modifier.width(4.dp))
-
                 // Check button for "Sudah Sholat"
-                val isDone = (item.status == PrayerStatus.DONE)
+                val checkBgColor by animateColorAsState(
+                    targetValue = if (isDone) ForestGreen else MaterialTheme.colorScheme.surfaceVariant,
+                    animationSpec = tween(250),
+                    label = "CheckBg"
+                )
+                val checkIconTint by animateColorAsState(
+                    targetValue = if (isDone) Color.White else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                    animationSpec = tween(250),
+                    label = "CheckTint"
+                )
                 IconButton(
                     onClick = onToggleStatus,
                     modifier = Modifier
                         .size(32.dp)
-                        .background(
-                            color = if (isDone) ForestGreen else Color(0xFFF1F5F2),
-                            shape = CircleShape
-                        )
+                        .background(color = checkBgColor, shape = CircleShape)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = if (isDone) "Sudah Sholat" else "Tandai Sholat",
-                        tint = if (isDone) Color.White else Color(0xFF94A3B8),
-                        modifier = Modifier.size(18.dp)
+                        tint = checkIconTint,
+                        modifier = Modifier.size(17.dp)
                     )
                 }
             }

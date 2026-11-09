@@ -7,6 +7,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
@@ -173,24 +182,32 @@ class MainActivity : ComponentActivity() {
             Screen.Settings.route
         )
 
+        val bottomRoutes = setOf(
+            Screen.Home.route,
+            Screen.PrayerSchedule.route,
+            Screen.Settings.route
+        )
+
         Scaffold(
             bottomBar = {
                 if (showBottomBar) {
                     NavigationBar(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .shadow(elevation = 12.dp, shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                            .shadow(elevation = 8.dp, shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
                             .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)),
                         containerColor = MaterialTheme.colorScheme.surface,
-                        tonalElevation = 8.dp
+                        tonalElevation = 0.dp
                     ) {
                         NavigationBarItem(
                             selected = (currentRoute == Screen.Home.route),
                             onClick = {
-                                navController.navigate(Screen.Home.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
+                                if (currentRoute != Screen.Home.route) {
+                                    navController.navigate(Screen.Home.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
                                 }
                             },
                             icon = {
@@ -200,23 +217,31 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier.size(24.dp)
                                 )
                             },
-                            label = { Text("Beranda", fontSize = 11.sp, fontWeight = FontWeight.Medium) },
+                            label = {
+                                Text(
+                                    text = "Beranda",
+                                    fontSize = 11.sp,
+                                    fontWeight = if (currentRoute == Screen.Home.route) FontWeight.Bold else FontWeight.Medium
+                                )
+                            },
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = MaterialTheme.colorScheme.primary,
                                 selectedTextColor = MaterialTheme.colorScheme.primary,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                indicatorColor = MaterialTheme.colorScheme.surfaceVariant
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                indicatorColor = Color.Transparent
                             )
                         )
 
                         NavigationBarItem(
                             selected = (currentRoute == Screen.PrayerSchedule.route),
                             onClick = {
-                                navController.navigate(Screen.PrayerSchedule.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
+                                if (currentRoute != Screen.PrayerSchedule.route) {
+                                    navController.navigate(Screen.PrayerSchedule.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
                                 }
                             },
                             icon = {
@@ -226,39 +251,53 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier.size(24.dp)
                                 )
                             },
-                            label = { Text("Riwayat", fontSize = 11.sp, fontWeight = FontWeight.Medium) },
+                            label = {
+                                Text(
+                                    text = "Riwayat",
+                                    fontSize = 11.sp,
+                                    fontWeight = if (currentRoute == Screen.PrayerSchedule.route) FontWeight.Bold else FontWeight.Medium
+                                )
+                            },
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = MaterialTheme.colorScheme.primary,
                                 selectedTextColor = MaterialTheme.colorScheme.primary,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                indicatorColor = MaterialTheme.colorScheme.surfaceVariant
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                indicatorColor = Color.Transparent
                             )
                         )
 
                         NavigationBarItem(
                             selected = (currentRoute == Screen.Settings.route),
                             onClick = {
-                                navController.navigate(Screen.Settings.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
+                                if (currentRoute != Screen.Settings.route) {
+                                    navController.navigate(Screen.Settings.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
                                 }
                             },
                             icon = {
                                 Icon(
-                                    imageVector = Icons.Outlined.Settings,
+                                    imageVector = if (currentRoute == Screen.Settings.route) Icons.Filled.Settings else Icons.Outlined.Settings,
                                     contentDescription = "Pengaturan",
                                     modifier = Modifier.size(24.dp)
                                 )
                             },
-                            label = { Text("Pengaturan", fontSize = 11.sp, fontWeight = FontWeight.Medium) },
+                            label = {
+                                Text(
+                                    text = "Pengaturan",
+                                    fontSize = 11.sp,
+                                    fontWeight = if (currentRoute == Screen.Settings.route) FontWeight.Bold else FontWeight.Medium
+                                )
+                            },
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = MaterialTheme.colorScheme.primary,
                                 selectedTextColor = MaterialTheme.colorScheme.primary,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                indicatorColor = MaterialTheme.colorScheme.surfaceVariant
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                indicatorColor = Color.Transparent
                             )
                         )
                     }
@@ -272,7 +311,56 @@ class MainActivity : ComponentActivity() {
             ) {
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.Splash.route
+                    startDestination = Screen.Splash.route,
+                    enterTransition = {
+                        val fromBottom = initialState.destination.route in bottomRoutes
+                        val toBottom = targetState.destination.route in bottomRoutes
+                        if (fromBottom && toBottom) {
+                            fadeIn(animationSpec = tween(220, easing = LinearOutSlowInEasing)) +
+                                scaleIn(initialScale = 0.98f, animationSpec = tween(220))
+                        } else {
+                            slideIntoContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Start,
+                                animationSpec = tween(320, easing = FastOutSlowInEasing)
+                            ) + fadeIn(animationSpec = tween(320))
+                        }
+                    },
+                    exitTransition = {
+                        val fromBottom = initialState.destination.route in bottomRoutes
+                        val toBottom = targetState.destination.route in bottomRoutes
+                        if (fromBottom && toBottom) {
+                            fadeOut(animationSpec = tween(180, easing = FastOutLinearInEasing))
+                        } else {
+                            slideOutOfContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Start,
+                                animationSpec = tween(320, easing = FastOutSlowInEasing)
+                            ) + fadeOut(animationSpec = tween(220))
+                        }
+                    },
+                    popEnterTransition = {
+                        val fromBottom = initialState.destination.route in bottomRoutes
+                        val toBottom = targetState.destination.route in bottomRoutes
+                        if (fromBottom && toBottom) {
+                            fadeIn(animationSpec = tween(220, easing = LinearOutSlowInEasing))
+                        } else {
+                            slideIntoContainer(
+                                AnimatedContentTransitionScope.SlideDirection.End,
+                                animationSpec = tween(320, easing = FastOutSlowInEasing)
+                            ) + fadeIn(animationSpec = tween(320))
+                        }
+                    },
+                    popExitTransition = {
+                        val fromBottom = initialState.destination.route in bottomRoutes
+                        val toBottom = targetState.destination.route in bottomRoutes
+                        if (fromBottom && toBottom) {
+                            fadeOut(animationSpec = tween(180, easing = FastOutLinearInEasing))
+                        } else {
+                            slideOutOfContainer(
+                                AnimatedContentTransitionScope.SlideDirection.End,
+                                animationSpec = tween(320, easing = FastOutSlowInEasing)
+                            ) + fadeOut(animationSpec = tween(220))
+                        }
+                    }
                 ) {
                     // 1. Splash Screen
                     composable(Screen.Splash.route) {

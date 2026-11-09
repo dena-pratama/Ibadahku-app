@@ -1,5 +1,7 @@
 package com.ibadahku.app.ui.screens
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -292,8 +294,16 @@ fun FilterChipItem(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val bgColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-    val textColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+    val bgColor by animateColorAsState(
+        targetValue = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+        animationSpec = tween(220),
+        label = "chipBg"
+    )
+    val textColor by animateColorAsState(
+        targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+        animationSpec = tween(220),
+        label = "chipText"
+    )
 
     Box(
         modifier = Modifier
@@ -325,12 +335,24 @@ fun TodoTaskItemCard(
     onToggle: () -> Unit,
     onClickBody: () -> Unit
 ) {
+    val checkBg by animateColorAsState(
+        targetValue = if (task.isCompleted) MaterialTheme.colorScheme.primary else Color.Transparent,
+        animationSpec = tween(220),
+        label = "todoCheckBg"
+    )
+    val checkBorder by animateColorAsState(
+        targetValue = if (task.isCompleted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+        animationSpec = tween(220),
+        label = "todoCheckBorder"
+    )
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClickBody() },
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
@@ -344,10 +366,10 @@ fun TodoTaskItemCard(
                 modifier = Modifier
                     .size(28.dp)
                     .clip(CircleShape)
-                    .background(if (task.isCompleted) MaterialTheme.colorScheme.primary else Color.Transparent)
+                    .background(checkBg)
                     .border(
                         width = 2.dp,
-                        color = if (task.isCompleted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                        color = checkBorder,
                         shape = CircleShape
                     )
                     .clickable { onToggle() },
